@@ -2,8 +2,8 @@ const express = require('express')
 const router = express.Router()
 const multer = require('multer')
 const fs = require('fs')
-const JSzip = require('jszip')
-const fileSaver = require('file-saver')
+const Zip = require('adm-zip')
+const AdmZip = require('adm-zip')
 
 const upload = multer({
     storae: multer.diskStorage({
@@ -24,8 +24,22 @@ router.get('/', (req, res, next) => {
     })
 })
 
+function decodeBase64Image(dataString) {
+    var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+      response = {};
+  
+    if (matches.length !== 3) {
+      return new Error('Invalid input string');
+    }
+  
+    response.type = matches[1];
+    response.data = new Buffer(matches[2], 'base64');
+  
+    return response;
+}
+
 router.post('/upload', (req, res, next) => {
-    const data = Buffer.from(req.body.img, 'base64')
+    const data = decodeBase64Image(req.body.img).data
     const fileName = `uploads/${req.body.fileName.split('.')[0]}.png`
 
     fs.writeFile(fileName, data, (err => {
@@ -37,26 +51,12 @@ router.post('/upload', (req, res, next) => {
 })
 
 router.get('/download', (req, res, next) => {
-    const zip = new JSzip()
-
-    // zip.folder('images')
-
-    const img = fs.readFile('uploads/t5.png', 'base64', (err, data) => {
-        if (err) throw err
-        return data
-    })
-
-    zip.file('test.png', img, {base64: true})
-
-    zip.generateAsync({type: "base64"})
-    .then((content) => {
-        console.log("data:application/zip;base64," + content)
-        const url = "data:application/zip;base64," + content;
-    })
-
-    res.send({
-        success: true
-    })
+    console.log('다운로드 시작')
+    const zip = new Zip()    
+    
+    zip.addLocalFolder('uploads')
+    fs.writeFileSync('test.zip', zip.toBuffer())
+    console.log('다운로드 종료')
 })
 
 module.exports = router
