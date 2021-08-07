@@ -144,8 +144,9 @@
             },
 
             async downloadImage() {
-                let res = await axios.get('http://localhost:3000/file/download')
-                console.log(res.data)
+                // zipRes = await axios.get('/file/zip')
+
+                let res = await axios.get(`/file/download/output.zip`)
             },
 
             async loadImage(e) {
@@ -168,7 +169,7 @@
                     return false
                 }
 
-                let res = await axios.post('http://localhost:3000/file/upload', {
+                let res = await axios.post('/file/upload', {
                     img: this.imageBuf,
                     fileName: this.fileName
                 })

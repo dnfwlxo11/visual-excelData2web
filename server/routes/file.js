@@ -3,7 +3,7 @@ const router = express.Router()
 const multer = require('multer')
 const fs = require('fs')
 const Zip = require('adm-zip')
-const AdmZip = require('adm-zip')
+const { spawn } = require('child_process')
 
 const upload = multer({
     storae: multer.diskStorage({
@@ -50,13 +50,29 @@ router.post('/upload', (req, res, next) => {
     }))
 })
 
-router.get('/download', (req, res, next) => {
-    console.log('다운로드 시작')
-    const zip = new Zip()    
+router.get('/zip', (req, res, next) => {
+    const python = spawn('python3', ['app.py'])
+    python.stdout.on('data', (data) => {
+        console.log(data, 'asd')
+    })
+})
+
+router.get('/download/:filename', (req, res, next) => {
+    console.log(`${req.params.filename} 파일 전송 시작`)
+
+    const filePath = `downloads/${req.params.filename}`
+
+    let sendData = fs.createReadStream(filePath)
+
+    res.setHeader('Content-Disposition', `attachment; filename=${req.params.filename}`)
+    res.setHeader('Content-Type', 'application/zip')
     
-    zip.addLocalFolder('uploads')
-    fs.writeFileSync('test.zip', zip.toBuffer())
-    console.log('다운로드 종료')
+    sendData.pipe(res).on('finish', () => {
+        res.status(200).end()
+        console.log(`${req.params.filename} 파일 전송 완료`)
+    }).on('error', () => {
+        res.send({ success: false, msg: "파일 전송 간 문제가 발생했습니다."})
+    })
 })
 
 module.exports = router
