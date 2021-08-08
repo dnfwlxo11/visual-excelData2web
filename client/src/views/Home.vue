@@ -2,7 +2,8 @@
     <div class="home">
         <div class="mb-3">
             <button class="btn btn-primary mr-3" @click="downloadData">데이터 다운로드</button>
-            <button class="btn btn-primary mr-3" @click="zipImage">압축요청</button>
+            <button class="btn btn-primary mr-3" @click="zipImage_js">압축요청(Js)</button>
+            <button class="btn btn-primary mr-3" @click="zipImage_python">압축요청(Python)</button>
             <button class="btn btn-primary" @click="downloadImage">이미지 다운로드</button>
         </div>
     </div>
@@ -46,13 +47,23 @@
                 XLSX.writeFile(wb, `data_${currData.getTime()}.xlsx`)
             },
 
-            async zipImage() {
-                let zipRes = await axios.get('/file/zip')
+            async zipImage_python() {
+                let zipRes = await axios.get('/file/zip/python')
+                console.log
+            },
+            
+            async zipImage_js() {
+                let zipRes = await axios.get('/file/zip/js')
+                this.fileName = zipRes.data.fileName
+                // window.location.href = `/file/zip/js/${zipRes.data.fileName}`
             },
 
             async downloadImage() {
-
-                let res = await axios.get(`/file/download/output.zip`)
+                
+                // await axios.get(`/file/download/2_${this.fileName}`)
+                // window.location.href = `/file/download/2_${this.fileName}`
+                await axios.get(`/file/download/1_1628360848831_output.zip`)
+                window.location.href = `/file/download/1_1628360848831_output.zip`
             },
 
             async loadImage(e) {

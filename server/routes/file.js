@@ -3,7 +3,7 @@ const router = express.Router()
 const multer = require('multer')
 const fs = require('fs')
 const Zip = require('adm-zip')
-const { spawn } = require('child_process')
+const spawn = require('child_process').spawn
 
 const upload = multer({
     storae: multer.diskStorage({
@@ -50,11 +50,72 @@ router.post('/upload', (req, res, next) => {
     }))
 })
 
-router.get('/zip', (req, res, next) => {
-    const python = spawn('python3', ['app.py'])
-    python.stdout.on('data', (data) => {
-        console.log(data, 'asd')
+router.get('/zip/js', (req, res, next) => {
+    const zips = {}
+
+    const fileList = fs.readdirSync('uploads/', (err, list) => {
+        if (err) throw err
+        return list
     })
+
+    const outputPath = Date.now() + '_output.zip'
+
+    if (fileList.length) res.send({ msg: '압축을 시작', fileName: outputPath})
+    else res.send({ msg: '다운로드 받을 파일이 없습니다.'})
+
+    // 2147483648 Byte = 2GB
+    let size = 0
+    let cnt = 1
+    zips[cnt] = new Zip()
+    console.log('새로운 zip 객체 생성', cnt, '번째')
+    
+    fileList.forEach((file, idx) => {
+        const fileSize = fs.statSync(`uploads/${file}`).size
+        if (idx % 1000 == 0) console.log(idx, '번째 진행중')
+
+        if (size + fileSize > 2147483648) {
+            fs.writeFile(`downloads/${cnt}_${outputPath}`, zips[cnt].toBuffer(), (err) => {
+                if (err) throw err
+                console.log('압축 파일 생성 중', `${cnt}_${outputPath}`)
+            })
+
+            size = 0
+            cnt += 1
+            zips[cnt] = new Zip()
+            zips[cnt].addLocalFile(`uploads/${file}`)
+
+            console.log('새로운 zip 객체 생성', cnt, '번째')
+        }
+
+        size += fileSize
+
+        zips[cnt].addLocalFile(`uploads/${file}`)
+    })
+
+    fs.writeFile(`downloads/${cnt}_${outputPath}`, zips[cnt].toBuffer(), (err) => {
+        if (err) throw err
+        console.log('압축 파일 생성 중', `${cnt}_${outputPath}`)
+    })
+
+    // Object.keys(zips).forEach(key => {
+    //     fs.writeFile(`downloads/${key}_${outputPath}`, zips[key].toBuffer(), (err) => {
+    //         if (err) throw err
+    //         console.log('압축 파일 생성 중', `${key}_${outputPath}`)
+    //     })
+    // })
+})
+
+router.get('/zip/python', (req, res, next) => {
+    const python = spawn('python', ['routes/app.py'])
+    python.stdout.on('data', (data) => {
+        console.log(data.toString())
+    })
+
+    python.stderr.on('data', (data) => {
+        console.log(data.toString())
+    })
+
+    res.send({ success: true, msg: '압축 시작' })
 })
 
 router.get('/download/:filename', (req, res, next) => {
