@@ -1,15 +1,15 @@
 <template>
     <div class="home">
         <div class="mb-3">
-            <button class="btn btn-primary mr-3" @click="downloadData">데이터 다운로드</button>
-            <button class="btn btn-primary mr-3" @click="zipImage_js">압축요청(Js)</button>
-            <button class="btn btn-primary mr-3" @click="zipImage_python">압축요청(Python)</button>
-            <button class="btn btn-primary" @click="downloadImage">이미지 다운로드</button>
+            <input type="file" @change="fileUpload" entype="multipart/form-data">
+            <button class="btn btn-secondary" @click="uploadExcel">업로드</button>
         </div>
+        <h2>대충 차트 보여줌</h2>
     </div>
 </template>
 
 <script>
+    import EventBus from '@/EventBus'
     import axios from 'axios'
 
     import XLSX from 'xlsx'
@@ -21,78 +21,47 @@
             return {
                 file: null,
                 excelData: [],
-                imageBuf: null,
                 fileName: null
             }
         },
 
         created() {
-            this.loadData()
+            EventBus.$on("excelData", () => {
+                EventBus.$emit("excelData", this.excelData)
+            })
         },
 
         methods: {
-            async loadData() {
-                let res = await axios.get('/dummy.json')
-                this.excelData = res.data
-            },
-
-            downloadData() {
-                const wb = XLSX.utils.book_new()
-                // const tmp = this.excelData.splice(0, 500)
-                const xlsx = XLSX.utils.json_to_sheet(this.excelData)
-                const currData = new Date()
-
-                XLSX.utils.book_append_sheet(wb, xlsx, `data_${currData.getTime()}`)
-
-                XLSX.writeFile(wb, `data_${currData.getTime()}.xlsx`)
-            },
-
-            async zipImage_python() {
-                let zipRes = await axios.get('/file/zip/python')
-                console.log
-            },
-            
-            async zipImage_js() {
-                let zipRes = await axios.get('/file/zip/js')
-                this.fileName = zipRes.data.fileName
-                // window.location.href = `/file/zip/js/${zipRes.data.fileName}`
-            },
-
-            async downloadImage() {
-                
-                // await axios.get(`/file/download/2_${this.fileName}`)
-                // window.location.href = `/file/download/2_${this.fileName}`
-                await axios.get(`/file/download/1_1628360848831_output.zip`)
-                window.location.href = `/file/download/1_1628360848831_output.zip`
-            },
-
-            async loadImage(e) {
-                const file = e.target.files[0]
-                this.fileName = file.name
-                // this.imageBuf = data
-
-                this.imageBuf = await new Promise((resolve) => {
-                    const reader = new FileReader()
-                    reader.readAsDataURL(file)
-                    reader.onload = () => {
-                        resolve(reader.result)
-                    }
-                })
-            },
-
-            async uploadImage() {
-                if (!this.imageBuf) {
+            async uploadExcel() {
+                if (!this.file) {
                     alert('파일이 없습니다.')
                     return false
                 }
 
                 let res = await axios.post('/file/upload', {
-                    img: this.imageBuf,
                     fileName: this.fileName
                 })
 
                 console.log(res.data)
-            }
+            },
+
+            fileUpload(e) {
+                this.file = e.target.files[0]
+
+                const reader = new FileReader()
+
+                reader.onload = (e) => {
+                    const data = reader.result
+                    const excelData = XLSX.read(data, {
+                        type: 'binary'
+                    })
+
+                    this.excelData = XLSX.utils.sheet_to_json(excelData.Sheets['sheet'])
+                    this.keyName = Object.keys(this.excelData[0])
+                }
+
+                reader.readAsBinaryString(this.file)
+            },
         }
     }
 </script>
