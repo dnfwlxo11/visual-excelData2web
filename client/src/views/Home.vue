@@ -71,6 +71,7 @@
             initData() {
                 this.file = null
                 this.$store.commit('setExcelData', [])
+                this.excelData = this.$store.getters.getExcelData
             }
         }
     }
