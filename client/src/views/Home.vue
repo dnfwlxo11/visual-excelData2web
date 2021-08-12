@@ -1,21 +1,23 @@
 <template>
     <div class="home">
-        <div class="mb-3">
+        <div v-if="!excelData.length" class="mb-3">
             <input type="file" @change="fileUpload" entype="multipart/form-data">
             <button class="btn btn-secondary" @click="uploadExcel">업로드</button>
+        </div>
+        <div v-else>
+            <button class="btn btn-primary mb-3" @click="initData">초기화</button>
         </div>
         <h2>대충 차트 보여줌</h2>
     </div>
 </template>
 
 <script>
-    import EventBus from '@/EventBus'
     import axios from 'axios'
 
     import XLSX from 'xlsx'
 
     export default {
-        name: 'About',
+        name: 'Home',
 
         data() {
             return {
@@ -26,9 +28,11 @@
         },
 
         created() {
-            EventBus.$on("excelData", () => {
-                EventBus.$emit("excelData", this.excelData)
-            })
+            
+        },
+
+        mounted() {
+            this.excelData = this.$store.state.excelData
         },
 
         methods: {
@@ -56,12 +60,18 @@
                         type: 'binary'
                     })
 
-                    this.excelData = XLSX.utils.sheet_to_json(excelData.Sheets['sheet'])
+                    this.$store.commit('setExcelData', XLSX.utils.sheet_to_json(excelData.Sheets['sheet']))
+                    this.excelData = this.$store.getters.getExcelData
                     this.keyName = Object.keys(this.excelData[0])
                 }
 
                 reader.readAsBinaryString(this.file)
             },
+
+            initData() {
+                this.file = null
+                this.$store.commit('setExcelData', [])
+            }
         }
     }
 </script>

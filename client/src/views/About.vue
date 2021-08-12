@@ -1,10 +1,6 @@
 <template>
     <div class="about">
         <div class="container mt-3 mb-3">
-            <div class="mb-3">
-                <input type="file" @change="fileUpload" entype="multipart/form-data">
-                <button class="btn btn-secondary" @click="uploadExcel">업로드</button>
-            </div>
             <div v-if="excelData" class="text-left">
                 <small>데이터 개수 : {{ excelData.length }}</small>
             </div>
@@ -28,10 +24,7 @@
 </template>
 
 <script>
-    import EventBus from '@/EventBus'
     import axios from 'axios'
-
-    import XLSX from 'xlsx'
 
     export default {
         name: 'About',
@@ -46,12 +39,12 @@
         },
 
         created() {
-            EventBus.$emit("excelData")
+            
+        },
 
-            EventBus.$on("excelData", (data) => {
-                console.log('데이터 받음')
-                this.excelData = data
-            })
+        mounted() {
+            this.excelData = this.$store.getters.getExcelData
+            this.keyName = this.excelData.length ? Object.keys(this.excelData[0]) : ['데이터 없음']
         },
 
         methods: {
@@ -66,25 +59,7 @@
                 })
 
                 console.log(res.data)
-            },
-
-            fileUpload(e) {
-                this.file = e.target.files[0]
-
-                const reader = new FileReader()
-
-                reader.onload = (e) => {
-                    const data = reader.result
-                    const excelData = XLSX.read(data, {
-                        type: 'binary'
-                    })
-
-                    this.excelData = XLSX.utils.sheet_to_json(excelData.Sheets['sheet'])
-                    this.keyName = Object.keys(this.excelData[0])
-                }
-
-                reader.readAsBinaryString(this.file)
-            },
+            }
         }
     }
 </script>
