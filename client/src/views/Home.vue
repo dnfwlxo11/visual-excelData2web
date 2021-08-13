@@ -2,39 +2,63 @@
     <div class="home">
         <div v-if="!excelData.length" class="mb-3">
             <input type="file" @change="fileUpload" entype="multipart/form-data">
-            <!-- <button class="btn btn-secondary" @click="uploadExcel">업로드</button> -->
         </div>
         <div v-else>
             <button class="btn btn-primary mb-3" @click="initData">초기화</button>
         </div>
-        <div class="row">
-            <div class="col-2">
-                <p v-for="(item, idx) in keyName" :key="idx">{{ item }}</p>
-            </div>
-            <div class="col-8">
+        <div class="container">
+            <div class="row">
+                <div class="col-2">
+                    <div>
+                        <h2>컬럼 목록</h2>
+                    </div>
+                    <draggable class="dragArea list-group" :list="keyName" :clone="clone" :group="{ name: 'people', pull: pullFunction }" @start="start">
+                        <div class="list-group-item mb-2" v-for="(item, idx) of keyName" :key="idx">
+                            {{ item }}
+                        </div>
+                    </draggable>
+                </div>
+                <div class="col-2">
+                    <div>
+                        <h2>사용 컬럼</h2>
+                    </div>
+                    <draggable class="dragArea list-group" :list="chartData" group="people">
+                        <div class="list-group-item mb-2" v-for="(item, idx) of chartData" :key="idx">
+                        {{ item }}
+                        </div>
+                    </draggable>
+                </div>
+                <div class="col-8">
 
-            </div>
-            <div class="col-2">
-
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import draggable from "vuedraggable";
     // import axios from 'axios'
 
     import XLSX from 'xlsx'
 
     export default {
         name: 'Home',
+        display: "Clone on Control",
+
+        components: {
+            draggable
+        },
 
         data() {
             return {
                 file: null,
                 fileName: null,
                 excelData: [],
-                keyName: []
+                keyName: [],
+                chartData: [],
+                controlOnStart: true,
+                idGlobal: 0
             }
         },
 
@@ -48,19 +72,6 @@
         },
 
         methods: {
-            // async uploadExcel() {
-            //     if (!this.file) {
-            //         alert('파일이 없습니다.')
-            //         return false
-            //     }
-
-            //     let res = await axios.post('/file/upload', {
-            //         fileName: this.fileName
-            //     })
-
-            //     console.log(res.data)
-            // },
-
             fileUpload(e) {
                 this.file = e.target.files[0]
 
@@ -93,7 +104,26 @@
 
                 this.$store.commit('setKeyName', [])
                 this.keyName = this.$store.getters.getKeyName
+            },
+
+            clone(item) {
+                console.log(item)
+                return item;
+            },
+            
+            pullFunction() {
+                return this.controlOnStart ? "clone" : true;
+            },
+
+            start({ originalEvent }) {
+                this.controlOnStart = originalEvent.ctrlKey;
             }
         }
     }
 </script>
+
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
