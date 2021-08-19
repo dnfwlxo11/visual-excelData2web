@@ -49,6 +49,18 @@
                 excelData: [],
                 keyName: [],
 
+                excelCol: ["Data No", "등록번호", "생년월일", "성별", "검사날짜", 
+                           "125", "250", "500", "1K", "1.5K", "2K", "3K", "4K", "6K", "8K",
+                           "125_1", "250_1", "500_1", "1K_1", "1.5K_1", "2K_1", "3K_1", "4K_1", "6K_1", "8K_1",
+                           "125_2", "250_2", "500_2", "1K_2", "1.5K_2","2K_2", "3K_2", "4K_2", "6K_2", "8K_2", 
+                           "125_3", "250_3", "500_3", "1K_3", "1.5K_3", "2K_3", "3K_3", "4K_3", "6K_3", "8K_3",
+                           "우측 SRT", "좌측 SRT", "우측 WRS", "우측 레벨", "좌측 WRS", "좌측 레벨", 
+                           "우측 원인1 (필수)", "우측 원인2 (선택)", "우측 원인3 (선택)", 
+                           "좌측 원인1 (필수)", "좌측 원인2 (선택)", "좌측 원인3 (선택)", 
+                           "우측 고막1 (필수)", "우측 고막2 (선택)", "우측 고막3 (선택)", 
+                           "좌측 고막1 (필수)", "좌측 고막2 (선택)", "좌측 고막3 (선택)", 
+                           "우측", "좌측"],
+
                 text_eardr: {
                     "정상": "text_eardr_1", 
                     "천공": "text_eardr_2", 
@@ -81,67 +93,35 @@
                     "원인미상": "cause_loss_19"
                 },
 
-                parseCol: {
-                    "identifier": "Data No",
-                    "birth": "생년월일",
-                    "sex": "성별",
-                    "date": "검사날짜",
-                    "pta_ac_125": "125_2",
-                    "pta_ac_250": "250_2",
-                    "pta_ac_500": "500_2",
-                    "pta_ac_1000": "1K_2",
-                    "pta_ac_1500": "1.5K_2",
-                    "pta_ac_2000": "2K_2",
-                    "pta_ac_3000": "3K_2",
-                    "pta_ac_4000": "4K_2",
-                    "pta_ac_6000": "6K_2",
-                    "pta_ac_8000": "8K_2",
-                    "pta_bc_125": "125_3",
-                    "pta_bc_250": "250_3",
-                    "pta_bc_500": "500_3",
-                    "pta_bc_1000": "1K_3",
-                    "pta_bc_1500": "1.5K_3",
-                    "pta_bc_2000": "2K_3",
-                    "pta_bc_3000": "3K_3",
-                    "pta_bc_4000": "4K_3",
-                    "pta_bc_6000": "6K_3",
-                    "pta_bc_8000": "8K_3",
-                    "hearing_loss": 0, 
-                    "pta_img_src": null,
-                    "cause_loss_1": 0, 
-                    "cause_loss_2": 0, 
-                    "cause_loss_3": 0, 
-                    "cause_loss_4": 0, 
-                    "cause_loss_5": 0, 
-                    "cause_loss_6": 0, 
-                    "cause_loss_7": 0, 
-                    "cause_loss_8": 0, 
-                    "cause_loss_9": 0, 
-                    "cause_loss_10": 0, 
-                    "cause_loss_11": 0, 
-                    "cause_loss_12": 0, 
-                    "cause_loss_13": 0, 
-                    "cause_loss_14": 0, 
-                    "cause_loss_15": 0, 
-                    "cause_loss_16": 0, 
-                    "cause_loss_17": 0, 
-                    "cause_loss_18": 0, 
-                    "cause_loss_19": 0, 
-                    "cause_loss_priority": null,
-                    "text_eardr_1": 0, 
-                    "text_eardr_2": 0, 
-                    "text_eardr_3": 0, 
-                    "text_eardr_4": 0, 
-                    "text_eardr_5": 0, 
-                    "text_eardr_6": 0, 
-                    "text_eardr_7": 0, 
-                    "img_eardr": null, 
-                    "eardr_img_type": "text", 
-                    "text_eardr_priority": null,
-                    "srt_level": null,
-                    "wrs_level": null,
-                    "wrs_score": null
-                }
+                parseCol: [
+                    "identifier",
+                    "birth",
+                    "sex",
+                    "date",
+                    "pta_ac_125",
+                    "pta_ac_250",
+                    "pta_ac_500",
+                    "pta_ac_1000",
+                    "pta_ac_1500",
+                    "pta_ac_2000",
+                    "pta_ac_3000",
+                    "pta_ac_4000",
+                    "pta_ac_6000",
+                    "pta_ac_8000",
+                    "pta_bc_125",
+                    "pta_bc_250",
+                    "pta_bc_500",
+                    "pta_bc_1000",
+                    "pta_bc_1500",
+                    "pta_bc_2000",
+                    "pta_bc_3000",
+                    "pta_bc_4000",
+                    "pta_bc_6000",
+                    "pta_bc_8000",
+                    "srt_level",
+                    "wrs_level",
+                    "wrs_score"
+                ]
             }
         },
 
@@ -170,83 +150,66 @@
             },
 
             setOriginal() {
-                console.log(this.excelData)
-                const left_data = this.excelData.reduce((acc, item) => {
-                    const convertObj = Object.keys(this.parseCol).reduce((result, value) => {
-                        result[value] = item[this.parseCol[value]] != undefined ? item[this.parseCol[value]] : null
-                        return result
-                    }, {})
+                const exportData = this.excelData.reduce((acc, item) => {
+                    if (item["등록번호"]) {
+                        console.log(item["등록번호"])
+                        const baseCol = this.excelCol
+                        const rightCol = baseCol.slice(1, 25).concat(baseCol.slice(45, 46)).concat(baseCol.slice(47, 49))
+                        const rightCause = baseCol.slice(51, 54).map(arr => { if (item[arr]) return this.cause_loss[item[arr]] }).filter(arr => { if (arr != undefined) return arr })
+                        const rightEar = baseCol.slice(57, 60).map(arr => { if (item[arr]) return this.text_eardr[item[arr]] }).filter(arr => { if (arr != undefined) return arr })
+                        const leftCol = baseCol.slice(1, 5).concat(baseCol.slice(25, 45)).concat(baseCol.slice(46, 47)).concat(baseCol.slice(49, 51))
+                        const leftCause = baseCol.slice(54, 57).map(arr => { if (item[arr]) return this.cause_loss[item[arr]] }).filter(arr => { if (arr != undefined) return arr })
+                        const leftEar = baseCol.slice(60, 63).map(arr => { if (item[arr]) return this.text_eardr[item[arr]] }).filter(arr => { if (arr != undefined) return arr })
 
-                    convertObj["sex"] == '남자' ? convertObj.sex = 0 : convertObj.sex = 1
-                    convertObj["srt_level"] = item["좌측 SRT"]
-                    convertObj["wrs_level"] = item["좌측 WRS"]
-                    convertObj["wrs_score"] = item["좌측 레벨"]
-                    convertObj["ear_select"] = 1
-                    convertObj["eardr_img_type"] = "text"
+                        let cnt = 0
+                        const rightData = rightCol.reduce((right, value) => {
+                            right[this.parseCol[cnt]] = item[value]
+                            cnt += 1
+                            return right
+                        }, {})
 
-                    for (let i=1;i<=19;i++) convertObj[`cause_loss_${i}`] = 0
-                    for (let i=1;i<=7;i++) convertObj[`text_eardr_${i}`] = 0
+                        cnt = 0
+                        const leftData = leftCol.reduce((left, value) => {
+                            left[this.parseCol[cnt]] = item[value]
+                            cnt += 1
+                            return left
+                        }, {})
 
-                    convertObj[this.cause_loss[item["좌측 원인1 (필수)"]]] = 1
-                    if (item["좌측 원인2 (선택)"]) convertObj[this.cause_loss[item["좌측 원인2 (선택)"]]] = 1
-                    if (item["좌측 원인3 (선택)"]) convertObj[this.cause_loss[item["좌측 원인3 (선택)"]]] = 1
+                        for (let i=1;i<=19;i++) rightData[`cause_loss_${i}`] = 0
+                        for (let i=1;i<=7;i++) rightData[`text_eardr_${i}`] = 0
+                        for (let i=1;i<=19;i++) leftData[`cause_loss_${i}`] = 0
+                        for (let i=1;i<=7;i++) leftData[`text_eardr_${i}`] = 0
 
-                    convertObj[this.text_eardr[item["좌측 고막1 (필수)"]]] = 1
-                    if (item["좌측 고막2 (선택)"]) convertObj[this.text_eardr[item["좌측 고막2 (선택)"]]] = 1
-                    if (item["좌측 고막3 (선택)"]) convertObj[this.text_eardr[item["좌측 고막3 (선택)"]]] = 1
+                        rightData["cause_loss_priority"] = ""
+                        rightData["cause_loss_priority"] += rightCause.map(item => { if(item != undefined) return `${item}` })
+                        leftData["cause_loss_priority"] = ""
+                        leftData["cause_loss_priority"] += leftCause.map(item => { if(item != undefined) return `${item}` })
+                        rightData["text_eardr_priority"] = ""
+                        rightData["text_eardr_priority"] += rightEar.map(item => { if(item != undefined) return `${item}` })
+                        leftData["text_eardr_priority"] = ""
+                        leftData["text_eardr_priority"] += leftEar.map(item => { if(item != undefined) return `${item}` })
 
-                    convertObj["cause_loss_priority"] = `${this.cause_loss[item["좌측 원인1 (필수)"]]},${this.cause_loss[item["우측 원인2 (선택)"]]},${this.cause_loss[item["우측 원인3 (선택)"]]}`
-                    convertObj["text_eardr_priority"] = `${this.text_eardr[item["좌측 고막1 (필수)"]]},${this.text_eardr[item["우측 고막2 (선택)"]]},${this.text_eardr[item["우측 고막3 (선택)"]]}`
+                        for (let i=0;i<rightCause.length;i++) rightData[rightCause[i]] = 1
+                        for (let i=0;i<rightEar.length;i++) rightData[rightEar[i]] = 1
+                        for (let i=0;i<leftCause.length;i++) rightData[leftCause[i]] = 1
+                        for (let i=0;i<leftEar.length;i++) rightData[leftEar[i]] = 1
 
-                    acc.push(convertObj)
-                    
+                        
+                        acc.push(rightData)
+                        acc.push(leftData)
+
+                        // console.log(rightData, leftData)    
+                    }
+
                     return acc
                 }, [])
-
-                const right_data = this.excelData.reduce((acc, item) => {
-                    const convertObj = Object.keys(this.parseCol).reduce((result, value) => {
-                        result[value] = item[this.parseCol[value]] != undefined ? item[this.parseCol[value]] : null
-                        return result
-                    }, {})
-
-                    convertObj["sex"] == '남자' ? convertObj.sex = 0 : convertObj.sex = 1
-                    convertObj["srt_level"] = item["우측 SRT"]
-                    convertObj["wrs_level"] = item["우측 WRS"]
-                    convertObj["wrs_score"] = item["우측 레벨"]
-                    convertObj["ear_select"] = 0
-                    convertObj["eardr_img_type"] = "text"
-
-                    for (let i=1;i<=19;i++) convertObj[`cause_loss_${i}`] = 0
-                    for (let i=1;i<=7;i++) convertObj[`text_eardr_${i}`] = 0
-
-                    convertObj[this.cause_loss[item["우측 원인1 (필수)"]]] = 1
-                    if (item["우측 원인2 (선택)"]) convertObj[this.cause_loss[item["우측 원인2 (선택)"]]] = 1
-                    if (item["우측 원인3 (선택)"]) convertObj[this.cause_loss[item["우측 원인3 (선택)"]]] = 1
-
-                    convertObj[this.text_eardr[item["우측 고막1 (필수)"]]] = 1
-                    if (item["우측 고막2 (선택)"]) convertObj[this.text_eardr[item["우측 고막2 (선택)"]]] = 1
-                    if (item["우측 고막3 (선택)"]) convertObj[this.text_eardr[item["우측 고막3 (선택)"]]] = 1
-
-                    convertObj["cause_loss_priority"] = `${this.cause_loss[item["우측 원인1 (필수)"]]},${this.cause_loss[item["우측 원인2 (선택)"]]},${this.cause_loss[item["우측 원인3 (선택)"]]}`
-                    convertObj["text_eardr_priority"] = `${this.text_eardr[item["우측 고막1 (필수)"]]},${this.text_eardr[item["우측 고막2 (선택)"]]},${this.text_eardr[item["우측 고막3 (선택)"]]}`
-
-                    acc.push(convertObj)
-                    
-                    return acc
-                }, [])
-
-                // const left_data = this.excelData.reduce((acc, item) => {
-                    
-                //     return acc
-                // }, [])
-
-                const combineData = right_data.concat(left_data)
 
                 const wb = XLSX.utils.book_new()
-                const xlsx = XLSX.utils.json_to_sheet(combineData)
+                const xlsx = XLSX.utils.json_to_sheet(exportData)
                 XLSX.utils.book_append_sheet(wb, xlsx, 'sheet')
                 XLSX.writeFile(wb, `exports.xlsx`)
 
+                // 원래 프로젝트 코드
                 // if (this.excelData.length) {
                 //     this.excelData = this.originalData
                 //     this.keyName = Object.keys(this.originalData[0])

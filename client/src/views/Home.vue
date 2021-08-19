@@ -135,7 +135,7 @@
 
                     excel["!ref"] = "A2:" + excel["!ref"].split(':')[1]
                     
-                    this.$store.commit('setExcelData', XLSX.utils.sheet_to_json(excel))
+                    this.$store.commit('setExcelData', XLSX.utils.sheet_to_json(excel, {defval: null}))
                     this.excelData = this.$store.getters.getExcelData
 
                     this.$store.commit('setKeyName', Object.keys(this.excelData[0]))
