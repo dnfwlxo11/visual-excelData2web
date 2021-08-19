@@ -10,9 +10,9 @@
             <div class="row">
                 <div class="col-2">
                     <div>
-                        <h2>컬럼 목록</h2>
+                        <strong>컬럼 목록</strong>
                     </div>
-                    <draggable class="dragArea list-group" :list="keyName" :clone="clone" :group="{ name: 'people', pull: pullFunction }" @start="start">
+                    <draggable class="dragArea list-group" :list="keyName" :clone="clone" :group="{ name: 'original', pull: pullFunction }" @start="start">
                         <div class="list-group-item mb-2" v-for="(item, idx) of keyName" :key="idx">
                             {{ item }}
                         </div>
@@ -20,9 +20,9 @@
                 </div>
                 <div class="col-2">
                     <div>
-                        <h2>사용 컬럼</h2>
+                        <strong>사용 컬럼</strong>
                     </div>
-                    <draggable class="dragArea list-group" :list="chartData" group="people">
+                    <draggable class="dragArea list-group" :list="chartData" group="chart">
                         <div class="list-group-item mb-2" v-for="(item, idx) of chartData" :key="idx">
                         {{ item }}
                         </div>

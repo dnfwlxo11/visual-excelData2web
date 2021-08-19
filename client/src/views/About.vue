@@ -3,18 +3,18 @@
         <div class="container mt-3 mb-3">
             <div v-if="excelData" class="text-left mb-3">
                 <small class="mr-3">데이터 개수 : {{ excelData.length }}</small>
-                <button class="btn btn-secondary">원래대로</button>
+                <button class="btn btn-secondary" @click="setOriginal">원래대로</button>
             </div>
             <div v-if="excelData" class="row" style="max-width:inherit;max-height:500px;overflow: auto;white-space:nowrap;">
                 <table class="table">
                     <thead>
-                        <draggable v-model="keyName">
+                        <draggable v-model="keyName" tag="tr">
                             <th v-for="(item, idx) of keyName" :key="idx">
                                 {{ item }}
                             </th>
                         </draggable>
                     </thead>
-                    <draggable v-model="excelData">
+                    <draggable v-model="excelData" tag="tbody">
                         <tr v-for="(item, idx) in excelData" :key="idx">
                             <td v-for="(key, idx) of keyName" :key="idx">
                                 <span v-if="item[key]==null">-</span>
@@ -44,16 +44,18 @@
             return {
                 file: null,
                 fileName: null,
+                originalData: [],
                 excelData: [],
                 keyName: []
             }
         },
 
         created() {
-            
+
         },
 
         mounted() {
+            this.originalData = this.$store.getters.getExcelData
             this.excelData = this.$store.getters.getExcelData
             this.keyName = this.excelData.length ? Object.keys(this.excelData[0]) : ['데이터 없음']
         },
@@ -70,6 +72,13 @@
                 })
 
                 console.log(res.data)
+            },
+
+            setOriginal() {
+                if (this.excelData.length) {
+                    this.excelData = this.originalData
+                    this.keyName = Object.keys(this.originalData[0])
+                }
             }
         }
     }
