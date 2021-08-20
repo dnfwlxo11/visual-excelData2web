@@ -3,7 +3,7 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const cors = require('cors')
-const PORT = 3000
+const PORT = 300
 
 const fileRouter = require('./routes/file')
 
