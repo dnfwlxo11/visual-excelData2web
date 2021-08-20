@@ -51,11 +51,8 @@
                 keyName: [],
 
                 excelCol: dummy.excelCol,
-
                 text_eardr: dummy.text_eardr,
-
                 cause_loss: dummy.cause_loss,
-
                 parseCol: dummy.parseCol
             }
         },
@@ -65,7 +62,6 @@
         },
 
         mounted() {
-            console.log(dummy)
             this.originalData = this.$store.getters.getExcelData
             this.excelData = this.$store.getters.getExcelData
             this.keyName = this.excelData.length ? Object.keys(this.excelData[0]) : ["데이터 없음"]

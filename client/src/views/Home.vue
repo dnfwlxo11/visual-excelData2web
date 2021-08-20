@@ -58,29 +58,6 @@
                 keyName: [],
                 useColumn: [],
                 controlOnStart: true,
-
-
-
-                // originalCol: ["Data No", "등록번호", "생년월일", "성별", "검사날짜", 
-                //               "125", "250", "500", "1K", "1.5K", "2K", "3K", "4K", "6K", 
-                //               "125_1", "250_1", "500_1", "1K_1", "1.5K_1", "2K_1", 
-                //               "125_2", "250_2", "500_2", "1K_2", "2K_2", "3K_2", "4K_2", "6K_2", "8K_2", 
-                //               "125_3", "250_3", "500_3", "1K_3", "1.5K_3", "2K_3", 
-                //               "우측 SRT", "좌측 SRT", "우측 레벨", "좌측 레벨", 
-                //               "우측 원인1 (필수)", "우측 원인2 (선택)", "우측 원인3 (선택)", 
-                //               "좌측 원인1 (필수)", "좌측 원인2 (선택)", "좌측 원인3 (선택)", 
-                //               "우측 고막1 (필수)", "우측 고막2 (선택)", "우측 고막3 (선택)", 
-                //               "좌측 고막1 (필수)", "좌측 고막2 (선택)", "좌측 고막3 (선택)", 
-                //               "우측", "좌측"],
-
-                // exportCol: ["identifier", "birth", "sex", "date", "ear_select", 
-                //             "pta_ac_500", "pta_ac_1000", "pta_ac_2000", "pta_ac_4000", 
-                //             "pta_bc_500", "pta_bc_1000", "pta_bc_2000", "pta_bc_4000", 
-                //             "hearing_loss", "pta_img_src", "cause_loss_1", "cause_loss_2", "cause_loss_3", "cause_loss_4", "cause_loss_5", "cause_loss_6", "cause_loss_7", "cause_loss_8", "cause_loss_9", "cause_loss_10", "cause_loss_11", "cause_loss_12", "cause_loss_13", "cause_loss_14", "cause_loss_15", "cause_loss_16", "cause_loss_17", "cause_loss_18", "cause_loss_19", "cause_loss_priority", 
-                //             "text_eardr_1", "text_eardr_2", "text_eardr_3", "text_eardr_4", "text_eardr_5", "text_eardr_6", "text_eardr_7", 
-                //             "img_eardr", "eardr_img_type", "text_eardr_priority"],
-                
-                
             }
         },
 
@@ -140,7 +117,6 @@
 
                     this.$store.commit('setKeyName', Object.keys(this.excelData[0]))
                     this.keyName = this.$store.getters.getKeyName
-                    console.log(this.keyName)
                 }
 
                 reader.readAsBinaryString(this.file)
@@ -162,7 +138,6 @@
             log(item) {
                 this.$store.commit('setUseColumn', this.keyName)
                 this.$store.commit('setUseColumn', this.useColumn)
-                console.log(this.keyName, this.useColumn)
                 return item;
             },
             
