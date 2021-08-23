@@ -32,6 +32,7 @@
     import axios from "axios"
     import draggable from "vuedraggable"
     import XLSX from "xlsx"
+    import { format } from 'date-fns'
     import dummy from "@/dummy"
 
     export default {
@@ -82,10 +83,12 @@
             },
 
             getHearingLoss(data) {
-                const ptaAc = [data["pta_ac_500"] ? Number(data["pta_ac_500"]):null, data["pta_ac_1000"] ? Number(data["pta_ac_1000"]):null, data["pta_ac_2000"] ? Number(data["pta_ac_2000"]):null, data["pta_ac_4000"] ? Number(data["pta_ac_4000"]):null]
-                const ptaBc = [data["pta_bc_500"] ? Number(data["pta_bc_500"]):null, data["pta_bc_1000"] ? Number(data["pta_bc_1000"]):null, data["pta_bc_2000"] ? Number(data["pta_bc_2000"]):null, data["pta_bc_4000"] ? Number(data["pta_bc_4000"]):null]
+                const ptaAc = [Number(data["pta_ac_500"]), Number(data["pta_ac_1000"]), Number(data["pta_ac_2000"]), Number(data["pta_ac_4000"])]
+                const ptaBc = [Number(data["pta_bc_500"]), Number(data["pta_bc_1000"]), Number(data["pta_bc_2000"]), Number(data["pta_bc_4000"])]
                 const acLen = ptaAc.filter(item => { return item != null }).length
                 const bcLen = ptaBc.filter(item => { return item != null }).length
+
+                console.log(acLen, bcLen%4)
 
                 if (acLen!=4 || bcLen%4) return 4
                 else if (!bcLen) return 0
@@ -114,20 +117,22 @@
                     const leftCause = baseCol.slice(55, 58).map(arr => { if (item[arr]) return this.cause_loss[item[arr]] }).filter(arr => { return arr != undefined })
                     const leftEar = baseCol.slice(61, 64).map(arr => { if (item[arr]) return this.text_eardr[item[arr]] }).filter(arr => { return arr != undefined })
 
-                    console.log(rightCol)
-
                     let cnt = 0
                     const rightData = rightCol.reduce((right, value) => {
+                        // 만약 extension의 convert 실행한 파일의 경우 주석처리
+                        // if ((cnt == 1 || cnt == 3) && item[value] != null) right[this.parseCol[cnt]] = format(item[value], 'yyMMdd')
                         if (cnt > 24 && cnt < 57) right[this.parseCol[cnt]] = value
-                        else right[this.parseCol[cnt]] = item[value] != null ? item[value] : null
+                        else right[this.parseCol[cnt]] = item[value] == null || item[value] == "NR" || item[value] == "NT" ? null : item[value]
                         cnt += 1
                         return right
                     }, {})
 
                     cnt = 0
                     const leftData = leftCol.reduce((left, value) => {
+                        // 만약 extension의 convert 실행한 파일의 경우 주석처리
+                        // if ((cnt == 1 || cnt == 3) && item[value] != null) right[this.parseCol[cnt]] = format(item[value], 'yyMMdd')
                         if (cnt > 24 && cnt < 57) left[this.parseCol[cnt]] = value
-                        else left[this.parseCol[cnt]] = item[value] != null ? item[value] : null
+                        else left[this.parseCol[cnt]] = item[value] == null || item[value] == "NR" || item[value] == "NT" ? null : item[value]
                         cnt += 1
                         return left
                     }, {})
@@ -140,6 +145,21 @@
                     leftData["cause_loss_priority"] += leftCause.join(",")
                     for (let i=0;i<leftEar.length;i++) leftData[leftEar[i]] = 1
                     leftData["text_eardr_priority"] += leftEar.join(",")
+
+                    // convert.js를 실행한 데이터면 아래 주석 해제
+                    if (item["pta_img_src"]) {
+                        rightData["pta_img_src"] = item["pta_img_src"]
+                        leftData["pta_img_src"] = item["pta_img_src"]
+                    }
+                    if (item["img_eardr_1"]) {
+                        rightData["img_eardr"] = item["img_eardr_1"]
+                        rightData["eardr_img_type"] = "image"
+                        
+                    }
+                    if (item["img_eardr_2"]) {
+                        leftData["img_eardr"] = item["img_eardr_2"]
+                        leftData["eardr_img_type"] = "image"
+                    }
 
                     rightData["ear_select"] = 0
                     leftData["ear_select"] = 1

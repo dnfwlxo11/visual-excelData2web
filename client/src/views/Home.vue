@@ -104,13 +104,15 @@
                 reader.onload = (e) => {
                     const data = reader.result
                     const excelData = XLSX.read(data, {
-                        type: 'binary'
+                        type: 'binary',
+                        cellDates: true
                     })
                     
                     const sheetName = Object.keys(excelData.Sheets)[0]
                     const excel = excelData.Sheets[sheetName]
 
-                    excel["!ref"] = "A2:" + excel["!ref"].split(':')[1]
+                    // 만약 extension의 convert 실행한 파일의 경우 주석처리
+                    // excel["!ref"] = "A2:" + excel["!ref"].split(':')[1]
                     
                     this.$store.commit('setExcelData', XLSX.utils.sheet_to_json(excel, {defval: null}))
                     this.excelData = this.$store.getters.getExcelData
