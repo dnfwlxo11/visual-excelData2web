@@ -83,12 +83,10 @@
             },
 
             getHearingLoss(data) {
-                const ptaAc = [Number(data["pta_ac_500"]), Number(data["pta_ac_1000"]), Number(data["pta_ac_2000"]), Number(data["pta_ac_4000"])]
-                const ptaBc = [Number(data["pta_bc_500"]), Number(data["pta_bc_1000"]), Number(data["pta_bc_2000"]), Number(data["pta_bc_4000"])]
+                const ptaAc = [data["pta_ac_500"], data["pta_ac_1000"], data["pta_ac_2000"], data["pta_ac_4000"]]
+                const ptaBc = [data["pta_bc_500"], data["pta_bc_1000"], data["pta_bc_2000"], data["pta_bc_4000"]]
                 const acLen = ptaAc.filter(item => { return item != null }).length
                 const bcLen = ptaBc.filter(item => { return item != null }).length
-
-                console.log(acLen, bcLen%4)
 
                 if (acLen!=4 || bcLen%4) return 4
                 else if (!bcLen) return 0

@@ -47,8 +47,8 @@ xlsx.writeFile(newBook, "export_edit.xlsx" )
 
 function convertDate(date) {
     const d = date.toString() // YYMMDD
-    const yy = d.substr(0, 4)
+    const yyyy = d.substr(0, 4)
     const mm = d.substr(4, 2)
     const dd = d.substr(6, 2)
-    return yy + '-' + mm + '-' + dd
+    return yyyy + '-' + mm + '-' + dd
 }
