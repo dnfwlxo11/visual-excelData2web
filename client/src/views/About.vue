@@ -152,7 +152,6 @@
                     if (item["img_eardr_1"]) {
                         rightData["img_eardr"] = item["img_eardr_1"]
                         rightData["eardr_img_type"] = "image"
-                        
                     }
                     if (item["img_eardr_2"]) {
                         leftData["img_eardr"] = item["img_eardr_2"]
