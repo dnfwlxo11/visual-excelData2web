@@ -6,50 +6,52 @@
         <div v-else>
             <button class="btn btn-primary mb-3" @click="initData">초기화</button>
         </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-2" style="height: inherit;overflow: auto">
-                    <div>
-                        <strong>컬럼 목록</strong>
-                    </div>
-                    <draggable class="list-group" :list="keyName" group="chart" @change="log">
-                        <div class="list-group-item mb-2" v-for="(item, idx) of keyName" :key="idx">
-                            {{ item }}
+        <div class="row p-5">
+            <div class="col-4">
+                <div class="row mb-5">
+                    <div class="col-6">
+                        <div>
+                            <strong>컬럼 목록</strong>
                         </div>
-                    </draggable>
-                </div>
-                <div class="col-2">
-                    <div>
-                        <strong>사용 컬럼</strong>
+                        <draggable class="list-group" :list="keyName" group="chart" @change="log" style="height: 500px;overflow: auto">
+                            <div class="list-group-item mb-2" v-for="(item, idx) of keyName" :key="idx">
+                                {{ item }}
+                            </div>
+                        </draggable>
                     </div>
-                    <draggable class="list-group" :list="useColumn" group="chart" @change="log">
-                        <div class="list-group-item mb-2" v-for="(item, idx) of useColumn" :key="idx">
-                            {{ item }}
+                    <div class="col-6">
+                        <div>
+                            <strong>사용 컬럼</strong>
                         </div>
-                    </draggable>
-                </div>
-                <div class="col-2">
-                    <div class="mb-3">
-                        <button class="btn btn-warning" @click="renderChart">새로고침</button>
+                        <draggable class="list-group" :list="useColumn" group="chart" @change="log" style="height: 500px;overflow: auto">
+                            <div class="list-group-item mb-2" v-for="(item, idx) of useColumn" :key="idx">
+                                {{ item }}
+                            </div>
+                        </draggable>
                     </div>
-                    <div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button class="btn btn-warning mr-3" @click="renderChart">새로고침</button>
                         <button class="btn btn-danger" @click="destroyChart">지우기</button>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                        <label class="btn btn-outline-primary mr-1" :class="{'active': chartType == 'basic'}">
-                            <input type="radio" name="options" value="basic" @click="setChartType"> 기본
-                        </label>
-                        <label class="btn btn-outline-primary mr-1" :class="{'active': chartType == 'pie'}">
-                            <input type="radio" name="options" value="pie" @click="setChartType"> 파이 차트
-                        </label>
-                        <label class="btn btn-outline-primary" :class="{'active': chartType == 'multi'}">
-                            <input type="radio" name="options" value="multi" @click="setChartType"> 멀티 차트
-                        </label>
-                    </div>
-                    <div ref="chart" class="mb-6">
-
+            </div>
+            <div class="col-8">
+                <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
+                    <label class="btn btn-outline-primary mr-1" :class="{'active': chartType == 'basic'}">
+                        <input type="radio" name="options" value="basic" @click="setChartType"> 기본
+                    </label>
+                    <label class="btn btn-outline-primary mr-1" :class="{'active': chartType == 'pie'}">
+                        <input type="radio" name="options" value="pie" @click="setChartType"> 파이 차트
+                    </label>
+                    <label class="btn btn-outline-primary" :class="{'active': chartType == 'multi'}">
+                        <input type="radio" name="options" value="multi" @click="setChartType"> 멀티 차트
+                    </label>
+                </div>
+                <div style="height: 500px;overflow: auto">
+                    <div v-for="(item, idx) of useColumn" :key="idx">
+                        <div class="card mb-5 p-3" :ref="`chart-${idx}`"></div>
                     </div>
                 </div>
             </div>
@@ -80,6 +82,7 @@
                 chart: [],
                 chartType: "basic",
                 controlOnStart: true,
+                color: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800', '#3fA2E9', '#A2666D', '#E7A546', '#E63E91', '#800FF9']
             }
         },
 
@@ -140,18 +143,23 @@
                 this.destroyChart()
 
                 if (this.chartType == "basic") {
-                    this.chart.push(new ApexCharts(this.$refs.chart, options))
+                    this.chart.push(new ApexCharts(this.$refs['chart-0'][0], options))
                     this.chart[0].render()
-                } else {
+                } else if (this.chartType == "pie") {
                     options.forEach((item, idx) => {
-                        this.chart.push(new ApexCharts(this.$refs.chart, item))
-                        this.chart[idx].render()
+                        if (item.series.length > 30) {
+                            this.chart.push(null)
+                            this.$refs[`chart-${idx}`][0].innerHTML = `<strong>범례가 30개가 넘어 그래프로 표현할 수 없는 데이터입니다.</strong>`
+                        } else { 
+                            this.chart.push(new ApexCharts(this.$refs[`chart-${idx}`][0], item))
+                            this.chart[idx].render()
+                        }
                     })
                 }
             },
 
             destroyChart() {
-                this.chart.map(item => item.destroy())
+                this.chart.map(item => { if (item) item.destroy() })
                 this.chart = []
             },
 
@@ -164,10 +172,10 @@
                         breakpoint: 480,
                         options: {
                             legend: {
-                                position: 'bottom',
+                                position: 'top',
                             }
                         }
-                    }],
+                    }]
                 }
 
                 if (this.chartType == "basic") {
@@ -176,20 +184,18 @@
                     optionBase.chart = {
                         type: 'bar',
                         height: 350,
-                        stacked: true,
-                        stackType: '100%'
                     }
 
                     optionBase.responsive[0].options.legend = {
-                        position: 'bottom',
-                        offsetX: -10,
+                        position: 'top',
+                        offsetX: 0,
                         offsetY: 0
                     }
 
                     optionBase.xaxis = { categories: [] }
                     optionBase.fill = { opacity: 1 }
                     optionBase.legend = {
-                        position: 'right',
+                        position: 'top',
                         offsetX: 0,
                         offsetY: 50
                     }
@@ -215,7 +221,7 @@
 
                 this.useColumn.forEach((col, idx) => {
                     this.excelData.forEach((item) => {
-                        if (this.chartType == "basic") {
+                        if (this.chartType == "basic" && item[col] != undefined) {
                             if (!optionBase["xaxis"]["categories"].includes(col)) {
                                 optionBase["xaxis"]["categories"].push(col)
                                 optionBase["series"][0]["data"].push(0)
@@ -226,7 +232,7 @@
                                     optionBase['series'][0]["data"][seriesIdx] += 1
                                 }
                             })
-                        } else if (this.chartType == "pie") {
+                        } else if (this.chartType == "pie" && item[col] != undefined) {
                             if (!options[idx]['labels'].includes(item[col])) {
                                 options[idx]['labels'].push(item[col])
                                 options[idx]['series'].push(0)
@@ -237,6 +243,8 @@
 
                         }
                     })
+
+                    this.chartType == "basic" ? optionBase.title = { "text": "컬럼별 데이터 개수 표"} : options[idx].title = { "text": `${col} 데이터 분포 파이차트`}
                 })
 
                 return this.chartType == "basic" ? optionBase : options
@@ -254,6 +262,16 @@
                 this.renderChart()
 
                 return item
+            }
+        },
+
+        computed: {
+            getUseColumn() {
+                return this.useColumn
+            },
+
+            getType() {
+                return this.chartType
             }
         }
     }
