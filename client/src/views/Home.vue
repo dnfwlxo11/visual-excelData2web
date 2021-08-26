@@ -7,23 +7,23 @@
             <button class="btn btn-primary mb-3" @click="initData">초기화</button>
         </div>
         <div class="row p-5">
-            <div class="col-4">
+            <div v-if="getType!='home'" class="col-4">
                 <div class="row mb-5">
                     <div class="col-6">
-                        <div>
+                        <div class="mb-3">
                             <strong>컬럼 목록</strong>
                         </div>
-                        <draggable class="list-group" :list="keyName" group="chart" @change="log" style="height: 500px;overflow: auto">
+                        <draggable class="list-group" :list="keyName" group="chart" @change="log" style="height: 500px;overflow: auto;border: solid 1px;">
                             <div class="list-group-item mb-2" v-for="(item, idx) of keyName" :key="idx">
                                 {{ item }}
                             </div>
                         </draggable>
                     </div>
                     <div class="col-6">
-                        <div>
+                        <div class="mb-3">
                             <strong>사용 컬럼</strong>
                         </div>
-                        <draggable class="list-group" :list="useColumn" group="chart" @change="log" style="height: 500px;overflow: auto">
+                        <draggable class="list-group" :list="useColumn" group="chart" @change="log" style="height: 500px;overflow: auto;border: solid 1px;">
                             <div class="list-group-item mb-2" v-for="(item, idx) of useColumn" :key="idx">
                                 {{ item }}
                             </div>
@@ -37,21 +37,35 @@
                     </div>
                 </div>
             </div>
+            <div v-else class="col-2">
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">기준(번호) 컬럼명</label>
+                    <select class="form-control" v-model="standardCol" @change="setStandard">
+                        <option v-for="(item, idx) of originalKey" :key="idx" :value="item">{{ item }}</option>
+                    </select>
+                </div>
+            </div>
             <div class="col-8">
                 <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
+                    <label class="btn btn-outline-primary mr-1" :class="{'active': chartType == 'home'}">
+                        <input type="radio" name="options" value="home" @click="setChartType"> 대쉬보드
+                    </label>
                     <label class="btn btn-outline-primary mr-1" :class="{'active': chartType == 'basic'}">
-                        <input type="radio" name="options" value="basic" @click="setChartType"> 기본
+                        <input type="radio" name="options" value="basic" @click="setChartType"> 바차트
                     </label>
-                    <label class="btn btn-outline-primary mr-1" :class="{'active': chartType == 'pie'}">
-                        <input type="radio" name="options" value="pie" @click="setChartType"> 파이 차트
-                    </label>
-                    <label class="btn btn-outline-primary" :class="{'active': chartType == 'multi'}">
-                        <input type="radio" name="options" value="multi" @click="setChartType"> 멀티 차트
+                    <label class="btn btn-outline-primary" :class="{'active': chartType == 'pie'}">
+                        <input type="radio" name="options" value="pie" @click="setChartType"> 파이차트
                     </label>
                 </div>
                 <div style="height: 500px;overflow: auto">
-                    <div v-for="(item, idx) of useColumn" :key="idx">
+                    <div v-if="getType=='basic'&&useColumn.length">
+                        <div class="card mb-5 p-3" :ref="`chart-basic`"></div>
+                    </div>
+                    <div v-else-if="getType=='pie'" v-for="(item, idx) of useColumn" :key="idx">
                         <div class="card mb-5 p-3" :ref="`chart-${idx}`"></div>
+                    </div>
+                    <div v-else>
+                        <div class="card mb-5 p-3" :ref="`chart-dashboard`"></div>
                     </div>
                 </div>
             </div>
@@ -79,8 +93,10 @@
                 excelData: [],
                 keyName: [],
                 useColumn: [],
+                originalKey: [],
+                standardCol: null,
                 chart: [],
-                chartType: "basic",
+                chartType: "home",
                 controlOnStart: true,
                 color: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800', '#3fA2E9', '#A2666D', '#E7A546', '#E63E91', '#800FF9']
             }
@@ -94,6 +110,12 @@
             this.excelData = this.$store.state.excelData
             this.useColumn = this.$store.state.useColumn
             this.keyName = this.$store.state.keyName
+            this.originalKey = this.$store.state.originalKey
+            this.standardCol = this.$store.state.standardCol
+
+            this.$nextTick(() => {
+                this.renderChart()
+            })
         },
 
         methods: {
@@ -116,6 +138,11 @@
 
                     this.$store.commit('setKeyName', Object.keys(this.excelData[0]))
                     this.keyName = this.$store.getters.getKeyName
+
+                    this.$store.commit('setOriginalKey', Object.keys(this.excelData[0]))
+                    this.originalKey = this.$store.getters.getOriginalKey
+                    console.log(this.keyName, this.originalKey)
+                    this.standardCol = this.originalKey[0]
                 }
 
                 reader.readAsBinaryString(this.file)
@@ -143,7 +170,7 @@
                 this.destroyChart()
 
                 if (this.chartType == "basic") {
-                    this.chart.push(new ApexCharts(this.$refs['chart-0'][0], options))
+                    this.chart.push(new ApexCharts(this.$refs['chart-basic'], options))
                     this.chart[0].render()
                 } else if (this.chartType == "pie") {
                     options.forEach((item, idx) => {
@@ -155,6 +182,8 @@
                             this.chart[idx].render()
                         }
                     })
+                } else {
+
                 }
             },
 
@@ -199,24 +228,8 @@
                         offsetX: 0,
                         offsetY: 50
                     }
-                } else {
-                    this.useColumn.map(() => {
-                        const option = JSON.parse(JSON.stringify(optionBase))
-
-                        if (this.chartType == "pie") {
-                            option.chart = {
-                                width: 380,
-                                type: 'pie'
-                            }
-
-                            option.labels = []
-                            option.responsive[0].options.chart = { "width": 200 }
-
-                            options.push(option)
-                        } else if (this.chartType == "multi") {
-
-                        }
-                    })
+                } else if (this.chartType == "home") {
+                    
                 }
 
                 this.useColumn.forEach((col, idx) => {
@@ -239,20 +252,29 @@
                             }
 
                             options[idx]['series'][options[idx]['labels'].indexOf(item[col])] += 1
-                        } else if (this.chartType == "multi") {
+                        } else if (this.chartType == "home") {
 
                         }
                     })
 
-                    this.chartType == "basic" ? optionBase.title = { "text": "컬럼별 데이터 개수 표"} : options[idx].title = { "text": `${col} 데이터 분포 파이차트`}
+                    if (this.chartType == "pie") options[idx].title = { "text": `${col} 데이터 분포 파이차트`}
                 })
+
+                if (this.chartType == "basic") optionBase.title = { "text": "컬럼별 데이터 개수 표"}
 
                 return this.chartType == "basic" ? optionBase : options
             },
 
             setChartType(e) {
                 this.chartType = e.target.value
-                this.renderChart()
+
+                this.$nextTick(() => {
+                    this.renderChart()
+                })
+            },
+
+            setStandard() {
+                this.$store.commit('setStandardCol', this.standardCol)
             },
 
             log(item) {

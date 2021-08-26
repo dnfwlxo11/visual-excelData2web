@@ -5,12 +5,18 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
     state: {
+        standardCol: null,
         excelData: [],
         useColumn: [],
-        keyName: []
+        keyName: [],
+        originalKey: [],
     },
 
     getters: {
+        getStandardCol: (state) => {
+            return state.standardCol
+        },
+
         getExcelData: (state) => {
             return state.excelData
         },
@@ -21,10 +27,18 @@ export const store = new Vuex.Store({
 
         getKeyName: (state) => {
             return state.keyName
+        },
+
+        getOriginalKey: (state) => {
+            return state.originalKey
         }
     },
 
     mutations: {
+        setStandardCol: (state, payload) => {
+            return state.standardCol = payload
+        },
+        
         setExcelData: (state, payload) => {
             return state.excelData = payload
         },
@@ -35,6 +49,10 @@ export const store = new Vuex.Store({
 
         setKeyName: (state, payload) => {
             return state.keyName = payload
+        },
+
+        setOriginalKey: (state, payload) => {
+            return state.originalKey = payload
         }
     }
 })
