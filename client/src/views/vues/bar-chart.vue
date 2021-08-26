@@ -1,7 +1,7 @@
 <template>
     <div class="bar">
         <div v-if="useColumn.length">
-            <div class="card mb-5 p-3" :ref="`chart-basic`"></div>
+            <div class="card mb-5 p-3" ref="chart-basic"></div>
         </div>
     </div>
 </template>
@@ -28,7 +28,12 @@ export default {
                 }],
                 chart: {
                     type: 'bar',
-                    height: 350
+                    height: 350,
+                    events: {
+                        click(chart, w, e) {
+                        // console.log(chart, w, e)
+                        }
+                    }
                 },
                 responsive: [{
                     breakpoint: 480,
@@ -53,7 +58,7 @@ export default {
                 }
             }
 
-            this.useColumn.forEach((col, idx) => {
+            this.useColumn.forEach(col => {
                 this.excelData.forEach((item) => {
                     if (item[col] != undefined) {
                         if (!options["xaxis"]["categories"].includes(col)) {
@@ -62,8 +67,8 @@ export default {
                         }
                     }
 
-                    options["xaxis"]["categories"].map((value, seriesIdx) => {
-                        if (value == col) options['series'][0]["data"][seriesIdx] += 1
+                    options["xaxis"]["categories"].map((value, idx) => {
+                        if (value == col) options['series'][0]["data"][idx] += 1
                     })
                 })
             })
@@ -79,7 +84,6 @@ export default {
 
             this.chart.push(new ApexCharts(this.$refs['chart-basic'], options))
             this.chart[0].render()
-
         },
         
         destroyChart() {
@@ -87,18 +91,10 @@ export default {
                 if (item) item.destroy()
             })
             this.chart = []
-        },
-
-        event() {
-            this.$nextTick(() => {
-                this.renderChart()
-            })
         }
     },
     created() {
-        EventBus.$on("changeCol_basic", () => {
-            this.event()
-        })
+        EventBus.$on("changeCol_basic", this.renderChart)
     },
     mounted() {
     },

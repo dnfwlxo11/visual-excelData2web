@@ -35,17 +35,17 @@
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <button class="btn btn-warning mr-3" @click="EventBus.$emit(`changeCol_${getType}`)">새로고침</button>
+                            <button class="btn btn-warning mr-3" @click="reloadChart">새로고침</button>
                             <button class="btn btn-danger">지우기</button>
                         </div>
                     </div>
                 </div>
                 <div v-else class="col-2">
                     <div class="form-group">
-                        <label for="exampleFormControlSelect1">기준(번호) 컬럼명</label>
+                        <!-- <label for="exampleFormControlSelect1">기준(번호) 컬럼명</label>
                         <select class="form-control" v-model="standardCol" @change="setStandard">
                             <option v-for="(item, idx) of originalKey" :key="idx" :value="item">{{ item }}</option>
-                        </select>
+                        </select> -->
                     </div>
                 </div>
                 <div class="col-8">
@@ -164,14 +164,19 @@
             setChartType(e) {
                 this.chartType = e.target.value
 
-                EventBus.$emit(`changeCol_${this.getType}`)
-                // this.$nextTick(() => {
-                //     EventBus.$emit(`changeCol_${this.getType}`)
-                // })
+                this.$nextTick(() => {
+                    EventBus.$emit(`changeCol_${this.getType}`)
+                })
             },
 
             setStandard() {
                 this.$store.commit('setStandardCol', this.standardCol)
+            },
+
+            reloadChart() {
+                this.$nextTick(() => {
+                    EventBus.$emit(`changeCol_${this.getType}`)
+                })
             },
 
             log(item) {
@@ -179,9 +184,6 @@
                 this.$store.commit('setUseColumn', this.useColumn)
 
                 EventBus.$emit(`changeCol_${this.getType}`)
-                this.$nextTick(() => {
-                    EventBus.$emit(`changeCol_${this.getType}`)
-                })
 
                 return item
             }
