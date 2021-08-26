@@ -31,6 +31,7 @@
 <script>
     import axios from "axios"
     import draggable from "vuedraggable"
+    
 
     export default {
         name: "About",
