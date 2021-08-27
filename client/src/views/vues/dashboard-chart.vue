@@ -86,7 +86,7 @@
 
                 this.useColumn.forEach(col => {
                     this.excelData.forEach((item) => {
-                        if (item[col] != undefined) {
+                        if (item[col] != undefined || item[col]) {
                             if (!options["xaxis"]["categories"].includes(col)) {
                                 options["xaxis"]["categories"].push(col)
                                 options["series"][0]["data"].push(0)
@@ -94,7 +94,7 @@
                         }
 
                         options["xaxis"]["categories"].map((value, idx) => {
-                            if (value == col) options['series'][0]["data"][idx] += 1
+                            if ((value == col) && item[col]) options['series'][0]["data"][idx] += 1
                         })
                     })
                 })
@@ -106,14 +106,16 @@
                 return new ApexCharts(this.$refs['chart-main'], options)
             },
 
-            renderChart() {
+            getTotal() {
                 let total = 0
                 this.excelData.map(item => {
                     if (item[this.standardCol] != undefined || item[this.standardCol]) total+=1
                 })
 
                 this.$refs['chart-total'].innerText = `${total}개`
+            },
 
+            renderChart() {
                 const options = [this.setMain()]
                 this.destroyChart()
 
@@ -121,6 +123,11 @@
                     this.chart.push(item)
                     this.chart[idx].render()
                 })
+
+                this.$nextTick(() => {
+                    this.getTotal()
+                })
+                
             },
 
             destroyChart() {

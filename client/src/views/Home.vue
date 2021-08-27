@@ -60,7 +60,7 @@
                             <input type="radio" name="options" value="pie"> 파이차트
                         </label>
                     </div>
-                    <div style="height: 700px;overflow: auto">
+                    <div style="height: 750px;overflow: auto">
                         <home v-show="getType=='home'" :standardCol="standardCol" :useColumn="originalKey" :excelData="excelData"></home>
                         <bar v-show="getType=='basic'" :useColumn="useColumn" :excelData="excelData"></bar>
                         <div v-show="getType=='pie'" v-for="(item, idx) of useColumn" :key="idx">
@@ -144,6 +144,11 @@
 
                     this.$store.commit('setKeyName', Object.keys(this.excelData[0]))
                     this.keyName = this.$store.getters.getKeyName
+
+                    this.$nextTick(() => {
+                        this.reloadChart()
+                    })
+                    
                 }
 
                 reader.readAsBinaryString(this.file)
