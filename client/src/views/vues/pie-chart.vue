@@ -1,6 +1,6 @@
 <template>
     <div class="pie">
-        <div v-if="useColumn.length">
+        <div v-show="useColumn.length">
             <div class="card mb-5 p-3" ref="chart-pie"></div>
         </div>
     </div>

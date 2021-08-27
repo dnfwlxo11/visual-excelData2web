@@ -49,20 +49,20 @@
                     </div>
                 </div>
                 <div class="col-8">
-                    <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
+                    <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons" @change="setChartType">
                         <label class="btn btn-outline-primary mr-1" :class="{'active': getType == 'home'}">
-                            <input type="radio" name="options" value="home" @click="setChartType"> 대쉬보드
+                            <input type="radio" name="options" value="home"> 대쉬보드
                         </label>
                         <label class="btn btn-outline-primary mr-1" :class="{'active': getType == 'basic'}">
-                            <input type="radio" name="options" value="basic" @click="setChartType"> 바차트
+                            <input type="radio" name="options" value="basic"> 바차트
                         </label>
                         <label class="btn btn-outline-primary" :class="{'active': getType == 'pie'}">
-                            <input type="radio" name="options" value="pie" @click="setChartType"> 파이차트
+                            <input type="radio" name="options" value="pie"> 파이차트
                         </label>
                     </div>
                     <div style="height: 700px;overflow: auto">
-                        <bar v-if="getType=='basic'" :useColumn="useColumn" :excelData="excelData"></bar>
-                        <div v-else-if="getType=='pie'" v-for="(item, idx) of useColumn" :key="idx">
+                        <bar v-show="getType=='basic'" :useColumn="useColumn" :excelData="excelData"></bar>
+                        <div v-show="getType=='pie'" v-for="(item, idx) of useColumn" :key="idx">
                             <pie :useColumn="item" :excelData="excelData"></pie>
                         </div>
                     </div>
@@ -164,13 +164,13 @@
             setChartType(e) {
                 this.chartType = e.target.value
 
-                this.$nextTick(() => {
-                    EventBus.$emit(`changeCol_${this.getType}`)
-                })
+                EventBus.$emit(`changeCol_${this.getType}`)
             },
 
             setStandard() {
-                this.$store.commit('setStandardCol', this.standardCol)
+                this.$nextTick(() => {
+                    this.$store.commit('setStandardCol', this.standardCol)
+                })
             },
 
             reloadChart() {
