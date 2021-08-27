@@ -52,7 +52,7 @@ export const store = new Vuex.Store({
         },
 
         setOriginalKey: (state, payload) => {
-            return state.orig = payload
+            return state.originalKey = payload
         }
     }
 })

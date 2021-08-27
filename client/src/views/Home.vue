@@ -40,12 +40,12 @@
                         </div>
                     </div>
                 </div>
-                <div v-else class="col-2">
+                <div v-else class="col-4">
                     <div class="form-group">
-                        <!-- <label for="exampleFormControlSelect1">기준(번호) 컬럼명</label>
+                        <label>기준(번호) 컬럼명</label>
                         <select class="form-control" v-model="standardCol" @change="setStandard">
                             <option v-for="(item, idx) of originalKey" :key="idx" :value="item">{{ item }}</option>
-                        </select> -->
+                        </select>
                     </div>
                 </div>
                 <div class="col-8">
@@ -61,6 +61,7 @@
                         </label>
                     </div>
                     <div style="height: 700px;overflow: auto">
+                        <home v-show="getType=='home'" :standardCol="standardCol" :useColumn="originalKey" :excelData="excelData"></home>
                         <bar v-show="getType=='basic'" :useColumn="useColumn" :excelData="excelData"></bar>
                         <div v-show="getType=='pie'" v-for="(item, idx) of useColumn" :key="idx">
                             <pie :useColumn="item" :excelData="excelData"></pie>
@@ -74,6 +75,7 @@
 
 <script>
     import draggable from "vuedraggable"
+    import home from "./vues/dashboard-chart.vue"
     import bar from "./vues/bar-chart.vue"
     import pie from "./vues/pie-chart.vue"
     import { EventBus } from "../components/EventBus"
@@ -86,6 +88,7 @@
 
         components: {
             draggable,
+            home,
             bar,
             pie
         },
@@ -118,7 +121,7 @@
         },
 
         methods: {
-            fileUpload(e) {
+            async fileUpload(e) {
                 this.file = e.target.files[0]
 
                 const reader = new FileReader()
@@ -135,12 +138,12 @@
                     this.$store.commit('setExcelData', excel)
                     this.excelData = this.$store.getters.getExcelData
 
-                    this.$store.commit('setKeyName', Object.keys(this.excelData[0]))
-                    this.keyName = this.$store.getters.getKeyName
-
                     this.$store.commit('setOriginalKey', Object.keys(this.excelData[0]))
                     this.originalKey = this.$store.getters.getOriginalKey
                     this.standardCol = this.originalKey[0]
+
+                    this.$store.commit('setKeyName', Object.keys(this.excelData[0]))
+                    this.keyName = this.$store.getters.getKeyName
                 }
 
                 reader.readAsBinaryString(this.file)
@@ -168,15 +171,13 @@
             },
 
             setStandard() {
-                this.$nextTick(() => {
-                    this.$store.commit('setStandardCol', this.standardCol)
-                })
+                this.$store.commit('setStandardCol', this.standardCol)
+
+                EventBus.$emit(`changeCol_${this.getType}`)
             },
 
             reloadChart() {
-                this.$nextTick(() => {
-                    EventBus.$emit(`changeCol_${this.getType}`)
-                })
+                EventBus.$emit(`changeCol_${this.getType}`)
             },
 
             log(item) {
@@ -190,10 +191,6 @@
         },
 
         computed: {
-            getUseColumn() {
-                return this.useColumn
-            },
-
             getType() {
                 return this.chartType
             }
