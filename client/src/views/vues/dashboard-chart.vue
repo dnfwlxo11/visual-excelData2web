@@ -31,9 +31,7 @@
 </template>
 
 <script>
-    import {
-        EventBus
-    } from "../../components/EventBus"
+    import { EventBus } from "../../components/EventBus"
 
     export default {
         name: 'home',
@@ -86,7 +84,7 @@
 
                 this.useColumn.forEach(col => {
                     this.excelData.forEach((item) => {
-                        if (item[col] != undefined || item[col] != null) {
+                        if (item[col] != undefined) {
                             if (!options["xaxis"]["categories"].includes(col)) {
                                 options["xaxis"]["categories"].push(col)
                                 options["series"][0]["data"].push(0)
@@ -94,7 +92,7 @@
                         }
 
                         options["xaxis"]["categories"].map((value, idx) => {
-                            if ((value == col) && item[col]) options['series'][0]["data"][idx] += 1
+                            if ((value == col) && item[col] != null) options['series'][0]["data"][idx] += 1
                         })
                     })
                 })

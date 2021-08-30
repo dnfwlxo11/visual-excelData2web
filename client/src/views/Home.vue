@@ -8,7 +8,7 @@
                 <button class="btn btn-primary mb-3" @click="initData">초기화</button>
             </div>
             <div class="row justify-content-md-center p-5">
-                <div v-if="getType!='home'" class="col-4">
+                <div v-if="getType!='home'&&getType!='custom'" class="col-4">
                     <div class="row mb-5">
                         <div class="col-6">
                             <div class="mb-3">
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else class="col-4">
+                <div v-else-if="getType=='home'" class="col-4">
                     <div class="form-group">
                         <label>기준(번호) 컬럼명</label>
                         <select class="form-control" v-model="standardCol" @change="setStandard">
@@ -75,6 +75,7 @@
                         <div v-show="getType=='tree'" v-for="(item, idx) of getUseColumn" :key="`tree_${idx}`">
                             <tree :useColumn="item" :excelData="getExcelData"></tree>
                         </div>
+                        <custom v-show="getType=='custom'" :excelData="getExcelData"></custom>    
                     </div>
                 </div>
             </div>
@@ -88,6 +89,7 @@
     import bar from "./vues/bar-chart.vue"
     import pie from "./vues/pie-chart.vue"
     import tree from "./vues/treemap-chart.vue"
+    import custom from "./vues/custom-chart.vue"
     import { EventBus } from "../components/EventBus"
 
     import XLSX from 'xlsx'
@@ -101,7 +103,8 @@
             home,
             bar,
             pie,
-            tree
+            tree,
+            custom
         },
 
         data() {
