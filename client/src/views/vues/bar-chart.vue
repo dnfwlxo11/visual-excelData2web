@@ -60,7 +60,7 @@ export default {
 
             this.useColumn.forEach(col => {
                 this.excelData.forEach((item) => {
-                    if (item[col] != undefined || item[col]) {
+                    if (item[col] != undefined) {
                         if (!options["xaxis"]["categories"].includes(col)) {
                             options["xaxis"]["categories"].push(col)
                             options["series"][0]["data"].push(0)
@@ -68,12 +68,10 @@ export default {
                     }
 
                     options["xaxis"]["categories"].map((value, idx) => {
-                        if ((value == col) && item[col]) options['series'][0]["data"][idx] += 1
+                        if ((value == col)) options['series'][0]["data"][idx] += 1
                     })
                 })
             })
-
-            console.log(options)
 
             options.title = { "text": "컬럼별 데이터 개수 표" }
 
@@ -90,7 +88,7 @@ export default {
         
         destroyChart() {
             this.chart.map(item => {
-                if (item) item.destroy()
+                item.destroy()
             })
             this.chart = []
         }
@@ -101,6 +99,11 @@ export default {
     mounted() {
     },
     computed: {
+    },
+    beforeDestroy() {
+        this.destroyChart()
+    },
+    destroyed() {
     }
 }
 </script>

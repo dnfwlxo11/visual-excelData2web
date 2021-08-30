@@ -56,15 +56,24 @@
                         <label class="btn btn-outline-primary mr-1" :class="{'active': getType == 'basic'}">
                             <input type="radio" name="options" value="basic"> 바차트
                         </label>
-                        <label class="btn btn-outline-primary" :class="{'active': getType == 'pie'}">
+                        <label class="btn btn-outline-primary mr-1" :class="{'active': getType == 'pie'}">
                             <input type="radio" name="options" value="pie"> 파이차트
+                        </label>
+                        <label class="btn btn-outline-primary mr-1" :class="{'active': getType == 'tree'}">
+                            <input type="radio" name="options" value="tree"> 트리맵차트
+                        </label>
+                        <label class="btn btn-outline-primary mr-1" :class="{'active': getType == 'custom'}">
+                            <input type="radio" name="options" value="custom"> 커스텀차트
                         </label>
                     </div>
                     <div style="height: 750px;overflow: auto">
-                        <home v-show="getType=='home'" :standardCol="standardCol" :useColumn="originalKey" :excelData="excelData"></home>
-                        <bar v-show="getType=='basic'" :useColumn="useColumn" :excelData="excelData"></bar>
-                        <div v-show="getType=='pie'" v-for="(item, idx) of useColumn" :key="idx">
-                            <pie :useColumn="item" :excelData="excelData"></pie>
+                        <home v-show="getType=='home'" :standardCol="standardCol" :useColumn="originalKey" :excelData="getExcelData"></home>
+                        <bar v-show="getType=='basic'" :useColumn="getUseColumn" :excelData="getExcelData"></bar>
+                        <div v-show="getType=='pie'" v-for="(item, idx) of getUseColumn" :key="`pie_${idx}`">
+                            <pie :useColumn="item" :excelData="getExcelData"></pie>
+                        </div>
+                        <div v-show="getType=='tree'" v-for="(item, idx) of getUseColumn" :key="`tree_${idx}`">
+                            <tree :useColumn="item" :excelData="getExcelData"></tree>
                         </div>
                     </div>
                 </div>
@@ -78,6 +87,7 @@
     import home from "./vues/dashboard-chart.vue"
     import bar from "./vues/bar-chart.vue"
     import pie from "./vues/pie-chart.vue"
+    import tree from "./vues/treemap-chart.vue"
     import { EventBus } from "../components/EventBus"
 
     import XLSX from 'xlsx'
@@ -90,7 +100,8 @@
             draggable,
             home,
             bar,
-            pie
+            pie,
+            tree
         },
 
         data() {
@@ -186,6 +197,9 @@
             },
 
             log(item) {
+                this.excelData.splice(0, 0)
+                this.useColumn.splice(0, 0)
+
                 this.$store.commit('setExcelData', this.excelData)
                 this.$store.commit('setUseColumn', this.useColumn)
 
@@ -198,6 +212,14 @@
         computed: {
             getType() {
                 return this.chartType
+            },
+
+            getUseColumn() {
+                return this.useColumn
+            },
+
+            getExcelData() {
+                return this.excelData
             }
         }
     }

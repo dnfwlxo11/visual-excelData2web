@@ -1,7 +1,7 @@
 <template>
-    <div class="pie">
+    <div class="tree">
         <div v-show="useColumn.length">
-            <div class="card mb-5 p-3" ref="chart-pie"></div>
+            <div class="card mb-5 p-3" ref="chart-tree"></div>
         </div>
     </div>
 </template>
@@ -10,7 +10,7 @@
 import { EventBus } from "../../components/EventBus"
 
 export default {
-    name: 'pie',
+    name: 'tree',
     props: ['excelData', 'useColumn'],
     data() {
         return {
@@ -23,45 +23,35 @@ export default {
     methods: {
         setOptions() {
             const options = {
-                series: [],
+                series: [{
+                    data: []
+                }],
                 chart: {
-                    type: 'pie',
+                    type: 'treemap',
                     height: 350
                 },
                 labels: [],
-                responsive: [{
-                    breakpoint: 480,
-                    options: {
-                        legend: {
-                            position: 'right',
-                            offsetX: 0,
-                            offsetY: 0
-                        },
-                        chart: {
-                            width: 200
-                        }
-                    }
-                }],
                 legend: {
-                    position: 'right',
-                    offsetX: 0,
-                    offestY: 50
+                    show: false
                 }
             }
 
             
             this.excelData.forEach((item) => {
                 if (item[this.useColumn] != undefined) {
-                    if (!options['labels'].includes(item[this.useColumn])) {
-                        options['labels'].push(item[this.useColumn])
-                        options['series'].push(0)
+                    if (!options['series'][0]['data'].map(option => option['x']).includes(item[this.useColumn])) {
+                        options['series'][0]['data'].push({
+                            x: item[this.useColumn],
+                            y: 0
+                        })
                     }
 
-                    options['series'][options['labels'].indexOf(item[this.useColumn])] += 1
+                    if (options['series'][0]['data'].map(option => option['x']).indexOf(item[this.useColumn]) != -1)
+                        options['series'][0]['data'][options['series'][0]['data'].map(option => option['x']).indexOf(item[this.useColumn])]['y'] += 1
                 }
             })
 
-            options.title = { "text": `${this.useColumn} 데이터 분포 파이차트` }
+            options.title = { "text": `${this.useColumn} 데이터 분포 트리맵 차트` }
 
             return options
         },
@@ -70,12 +60,12 @@ export default {
             const options = this.setOptions()
             this.destroyChart()
             
-            if (options.series.length > 30) {
+            if (options.series[0]['data'].length > 30) {
                 this.chart.push(null)
-                this.$refs[`chart-pie`].innerHTML =
+                this.$refs[`chart-tree`].innerHTML =
                     `<strong>범례가 30개가 넘어 그래프로 표현할 수 없는 데이터입니다.</strong>`
             } else {
-                this.chart.push(new ApexCharts(this.$refs['chart-pie'], options))
+                this.chart.push(new ApexCharts(this.$refs['chart-tree'], options))
                 this.chart[0].render()
             }
         },
@@ -88,7 +78,7 @@ export default {
         },
     },
     created() {
-        EventBus.$on("changeCol_pie", this.renderChart)
+        EventBus.$on("changeCol_tree", this.renderChart)
     },
     mounted() {
     },
@@ -98,7 +88,6 @@ export default {
         this.destroyChart()
     },
     destroyed() {
-        
     }
 }
 </script>

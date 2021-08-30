@@ -14,14 +14,14 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-4" ref="chart-min">
+                <!-- <div class="col-md-4" ref="chart-min">
                     <div class="row justify-content-md-center mb-3"><strong>컬럼 리스트</strong></div>
                     <div style="height: 250px;overflow: auto;">
                         <ul class="list-group" v-for="(item, idx) of useColumn" :key="idx">
                             <li class="list-group-item">{{item}}</li>
                         </ul>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="row" ref="chart-basic">
                 <div class="col-12" ref="chart-main"></div>
@@ -86,7 +86,7 @@
 
                 this.useColumn.forEach(col => {
                     this.excelData.forEach((item) => {
-                        if (item[col] != undefined || item[col]) {
+                        if (item[col] != undefined || item[col] != null) {
                             if (!options["xaxis"]["categories"].includes(col)) {
                                 options["xaxis"]["categories"].push(col)
                                 options["series"][0]["data"].push(0)
@@ -143,7 +143,14 @@
         mounted() {
             // console.log(this.useColumn, this.excelData)
         },
-        computed: {}
+        computed: {
+
+        },
+        beforeDestroy() {
+            this.destroyChart()
+        },
+        destroyed() {
+        }
     }
 </script>
 
