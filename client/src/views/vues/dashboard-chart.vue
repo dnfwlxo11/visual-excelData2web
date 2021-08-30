@@ -40,8 +40,8 @@
             return {
                 // excelData: [],
                 // useColumn: [],
-                options: [],
-                chart: []
+                options: [1,2],
+                chart: [3,4]
             }
         },
         methods: {
