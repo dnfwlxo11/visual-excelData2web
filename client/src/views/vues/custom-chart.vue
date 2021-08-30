@@ -45,15 +45,20 @@
 </template>
 
 <script>
+    import draggable from "vuedraggable"
     import { EventBus } from "../../components/EventBus"
 
     export default {
         name: 'custom',
         props: ['excelData'],
+        components: {
+            draggable
+        },
+
         data() {
             return {
-                xCol: [1, 2],
-                yCol: [3, 4],
+                xCol: [],
+                yCol: [],
                 original: [],
             }
         },
